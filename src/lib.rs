@@ -1,3 +1,5 @@
+use std::char::ToUppercase;
+
 use pyo3::prelude::*;
 
 /// Formats the sum of two numbers as string.
@@ -9,29 +11,30 @@ fn capitalize_rust(s:&str) -> PyResult<String> {
 
     buffer.push_str(iterator.next().unwrap());
 
-    Ok(iterator.map(
-        |s| capitalize(s)
-    ).fold(buffer, |mut buf, sub| {buf.push_str(&sub); buf} ))
+    Ok(iterator.fold(buffer, |mut buf, s| {
+        if let Some((capitalized_chars, string_tail)) = capitalize(s) {
+            for char in capitalized_chars {
+                buf.push(char);
+            }
+            buf.push_str(string_tail);
+        }
+
+        buf
+    } ))
 
 }
 
-fn capitalize(s: &str) -> String {
+fn capitalize(s: &str) -> Option<(ToUppercase, &str)> {
     if s.is_empty() {
-        return String::new();
+        return None;
     }
     let mut chars = s.chars();
 
     let first_letter = chars.next().unwrap();
 
-    let mut buffer = String::new();
-
-    for subchar in first_letter.to_uppercase() {
-        buffer.push(subchar);
-    }
-
-    buffer.push_str(s.split_at(first_letter.len_utf8()).1);
-
-    buffer
+    Some((
+        first_letter.to_uppercase(), s.split_at(first_letter.len_utf8()).1
+    ))
 }
 
 /// A Python module implemented in Rust.
