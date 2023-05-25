@@ -19,9 +19,9 @@ fn capitalize(s: &str) -> String {
     if s.is_empty() {
         return String::new();
     }
-    let mut chars = s.char_indices();
+    let mut chars = s.chars();
 
-    let (_, first_letter) = chars.next().unwrap();
+    let first_letter = chars.next().unwrap();
 
     let mut buffer = String::new();
 
@@ -29,11 +29,7 @@ fn capitalize(s: &str) -> String {
         buffer.push(subchar);
     }
 
-    let Some((offset_of_rest, _)) = chars.next() else {
-        return buffer;
-    };
-
-    buffer.push_str(s.split_at(offset_of_rest).1);
+    buffer.push_str(s.split_at(first_letter.len_utf8()).1);
 
     buffer
 }
